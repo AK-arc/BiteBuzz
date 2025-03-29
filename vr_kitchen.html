@@ -1,1 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@webxr-polyfill@latest"></script>
+</head>
+<body>
+    <script>
+        let scene = new THREE.Scene();
+        let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        let renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
+        // Add a kitchen model (replace with real model file)
+        let loader = new THREE.TextureLoader();
+        let texture = loader.load('kitchen.jpg');
+        let material = new THREE.MeshBasicMaterial({ map: texture });
+        let geometry = new THREE.BoxGeometry(5, 5, 5);
+        let kitchen = new THREE.Mesh(geometry, material);
+        scene.add(kitchen);
+
+        camera.position.z = 5;
+
+        function animate() {
+            requestAnimationFrame(animate);
+            kitchen.rotation.y += 0.01;
+            renderer.render(scene, camera);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
