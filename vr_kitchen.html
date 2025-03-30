@@ -6,22 +6,31 @@
 </head>
 <body>
     <script>
+        // Initialize scene, camera, and renderer
         let scene = new THREE.Scene();
         let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        let renderer = new THREE.WebGLRenderer();
+        let renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         document.body.appendChild(renderer.domElement);
 
-        // Add a kitchen model (replace with real model file)
+        // Add lighting
+        let light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(5, 5, 5).normalize();
+        scene.add(light);
+
+        // Load texture
         let loader = new THREE.TextureLoader();
-        let texture = loader.load('kitchen.jpg');
+        let texture = loader.load('kitchen.jpg'); // Ensure the image path is correct
+
+        // Create a textured box
         let material = new THREE.MeshBasicMaterial({ map: texture });
         let geometry = new THREE.BoxGeometry(5, 5, 5);
         let kitchen = new THREE.Mesh(geometry, material);
         scene.add(kitchen);
 
-        camera.position.z = 5;
+        camera.position.z = 10;
 
+        // Animation loop
         function animate() {
             requestAnimationFrame(animate);
             kitchen.rotation.y += 0.01;
@@ -29,6 +38,13 @@
         }
 
         animate();
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
