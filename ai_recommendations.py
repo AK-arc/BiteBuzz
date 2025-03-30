@@ -4,7 +4,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 # Sample restaurant dataset
 data = {'Restaurant': ['Sushi House', 'Burger Mania', 'Pasta Palace'],
-        'Cuisines': ['Japanese Sushi', 'American Fast Food', 'Italian Pasta'],
+        'Cuisine': ['Japanese Sushi', 'American Fast Food', 'Italian Pasta'],
         'Tags': ['Fresh fish, traditional', 'Grilled, fast, cheesy', 'Authentic, homemade, creamy']}
 
 df = pd.DataFrame(data)
@@ -17,6 +17,9 @@ tfidf_matrix = vectorizer.fit_transform(df['Tags'])
 similarity_matrix = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
 # Recommendation function
+if restaurant_name not in df['Restaurant'].values:
+    return "Restaurant not found"
+
 def recommend_restaurants(restaurant_name, top_n=2):
     index = df[df['Restaurant'] == restaurant_name].index[0]
     scores = list(enumerate(similarity_matrix[index]))
