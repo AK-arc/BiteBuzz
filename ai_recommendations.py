@@ -21,10 +21,14 @@ if restaurant_name not in df['Restaurant'].values:
     return "Restaurant not found"
 
 def recommend_restaurants(restaurant_name, top_n=2):
-    index = df[df['Restaurant'] == restaurant_name].index[0]
+   if restaurant_name not in df['Restaurant'].values:
+    return "Restaurant not found"
+
     scores = list(enumerate(similarity_matrix[index]))
     scores = sorted(scores, key=lambda x: x[1], reverse=True)[1:top_n+1]
     return [df.iloc[i[0]]['Restaurant'] for i in scores]
+           if len(sorted_scores) == 0:
+    return []
 
 # Example usage
 print(recommend_restaurants('Sushi House'))
