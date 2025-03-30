@@ -1,33 +1,71 @@
 const express = require('express');
 const admin = require('firebase-admin');
+const cors = require('cors'); 
+const bodyParser = require('body-parser');
+
+// Load Firebase credentials
+const serviceAccount = require("./path-to-your-service-account.json");
 
 admin.initializeApp({
-    credential: admin.credential.applicationDefault(),
+    credential: admin.credential.cert(serviceAccount),
     databaseURL: "https://your-firebase-database.firebaseio.com"
 });
 
 const db = admin.firestore();
 const app = express();
-app.use(express.json());
 
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
+
+// Place Order with Validation
 app.post('/placeOrder', async (req, res) => {
-    const { userId, restaurant, items } = req.body;
-    const orderRef = await db.collection('orders').add({
-        userId,
-        restaurant,
-        items,
-        status: "Preparing",
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
-    });
+    try {
+        const { userId, restaurant, items } = req.body;
 
-    res.json({ success: true, orderId: orderRef.id });
+        // Validate input
+        if (!userId || !restaurant || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ error: "Invalid order details" });
+        }
+
+        // Store order in Firestore
+        const orderRef = await db.collection('orders').add({
+            userId,
+            restaurant,
+            items,
+            status: "Preparing",
+            timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+
+        res.json({ success: true, orderId: orderRef.id });
+    } catch (error) {
+        console.error("Error placing order:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
+// Track Order
 app.get('/trackOrder/:orderId', async (req, res) => {
-    const order = await db.collection('orders').doc(req.params.orderId).get();
-    if (!order.exists) return res.status(404).json({ error: "Order not found" });
+    try {
+        const orderId = req.params.orderId;
+        const order = await db.collection('orders').doc(orderId).get();
 
-    res.json(order.data());
+        if (!order.exists) {
+            return res.status(404).json({ error: "Order not found" });
+        }
+
+        res.json(order.data());
+    } catch (error) {
+        console.error("Error tracking order:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
-app.listen(3000, () => console.log("Server running on port 3000"));
+// Health Check Endpoint
+app.get('/', (req, res) => {
+    res.send("API is running!");
+});
+
+// Start Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
