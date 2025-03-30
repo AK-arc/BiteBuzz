@@ -8,7 +8,7 @@ const web3 = new Web3("https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID");
 // Load Contract
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Private Key (⚠️ NEVER expose private keys in public code!)
+// Private Key (NEVER expose private keys in public code!)
 const privateKey = "0xYourPrivateKey";
 const account = web3.eth.accounts.privateKeyToAccount(privateKey);
 web3.eth.accounts.wallet.add(account);
@@ -33,9 +33,9 @@ async function verifyFood(id) {
         const signedTx = await web3.eth.accounts.signTransaction(txData, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
-        console.log("✅ Transaction Successful! Hash:", receipt.transactionHash);
+        console.log(" Transaction Successful! Hash:", receipt.transactionHash);
     } catch (error) {
-        console.error("❌ Error:", error.message);
+        console.error(" Error:", error.message);
     }
 }
 
